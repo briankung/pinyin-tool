@@ -183,6 +183,7 @@ version = "0.1.0"
 dependencies = [
  "jieba-rs",
  "pinyin",
+ "regex",
  "unicode-segmentation",
 ]
 

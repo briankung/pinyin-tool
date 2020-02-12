@@ -1,8 +1,7 @@
 use jieba_rs::Jieba;
-use pinyin::{Pinyin, ToPinyin};
-
+use pinyin::{to_pinyin_vec, Pinyin};
+use regex::Regex;
 use std::io::{self, Read, Write};
-use unicode_segmentation::UnicodeSegmentation;
 
 fn read_stdin() -> io::Result<String> {
     let mut buffer = String::new();
@@ -12,38 +11,33 @@ fn read_stdin() -> io::Result<String> {
 
 // So this handles "words"
 fn extract_pinyin(word: &str) -> String {
-    let hanzi: Vec<&str> = UnicodeSegmentation::graphemes(word, true).collect();
-
-    let mut buffer = String::from("");
-
-    for zi in hanzi {
-        let character = match zi
-            .to_pinyin()
-            .next()
-            .and_then(|wtf| wtf)
-            .map(Pinyin::with_tone)
-        {
-            Some(pinyin) => pinyin,
-            None => zi,
-        };
-        buffer.push_str(character);
+    match to_pinyin_vec(word, Pinyin::with_tone).as_slice() {
+        [] => word.to_string(),
+        pinyin => pinyin.join(""),
     }
-
-    buffer
 }
 
-fn pinyin(hans: &str) -> String {
-    let words: Vec<&str> = Jieba::new().cut(hans, false);
+fn pinyin_words(hans: &str) -> String {
+    let pinyin_words = Jieba::new().cut(hans, false);
+    let mut words_iter = pinyin_words.iter().map(|word| extract_pinyin(word));
 
-    words
-        .iter()
-        .map(|word| extract_pinyin(word))
-        .collect::<Vec<String>>()
-        .join(" ")
+    let re = Regex::new(r"[\p{Punctuation}]").unwrap();
+    let mut sentence = String::from("");
+
+    while let Some(word) = words_iter.next() {
+        if re.is_match(&word) {
+            sentence = sentence.trim().to_string();
+            sentence.push_str(&word);
+        } else {
+            sentence.push_str(&format!("{} ", &word));
+        }
+    }
+
+    sentence.trim().to_string()
 }
 
 fn main() -> io::Result<()> {
-    io::stdout().write_all(pinyin(&read_stdin()?).as_bytes())?;
+    io::stdout().write_all(pinyin_words(&read_stdin()?).as_bytes())?;
     Ok(())
 }
 
@@ -53,7 +47,7 @@ mod tests {
 
     #[test]
     fn test_spaces() {
-        assert_eq!(pinyin("我去工作"), "wǒ qù gōngzuò");
+        assert_eq!(pinyin_words("我去工作"), "wǒ qù gōngzuò");
     }
 
     #[test]
@@ -61,6 +55,6 @@ mod tests {
         // This should actually be "lǎo pó, shēngrì kuàilè" (note the comma)
         // But I don't care to try to detect unicode punctuation at the moment
         // And jieba's default dict considers 生日快乐 to be one word
-        assert_eq!(pinyin("老婆，生日快乐"), "lǎopó ， shēngrìkuàilè");
+        assert_eq!(pinyin_words("老婆，我去工作"), "lǎopó，wǒ qù gōngzuò");
     }
 }

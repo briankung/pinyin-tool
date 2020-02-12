@@ -11,3 +11,4 @@ description = "A simple command line tool to convert Chinese characters to pinyi
 pinyin = "0.7"
 unicode-segmentation = "1.6.0"
 jieba-rs = "0.4"
+regex = "1"
