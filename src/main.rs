@@ -1,4 +1,6 @@
+use jieba_rs::Jieba;
 use pinyin::{Pinyin, ToPinyin};
+
 use std::io::{self, Read, Write};
 use unicode_segmentation::UnicodeSegmentation;
 
@@ -8,19 +10,36 @@ fn read_stdin() -> io::Result<String> {
     Ok(buffer.trim().to_string())
 }
 
-fn pinyin(text: &str) -> String {
-    let extract_pinyin = |zi: &str| zi.to_pinyin().next().and_then(|p| p).map(Pinyin::with_tone);
+// So this handles "words"
+fn extract_pinyin(word: &str) -> String {
+    let hanzi: Vec<&str> = UnicodeSegmentation::graphemes(word, true).collect();
 
-    let hanzi: Vec<&str> = UnicodeSegmentation::graphemes(text, true).collect();
+    let mut buffer = String::from("");
 
-    hanzi
-        .iter()
-        .map(|zi| match extract_pinyin(zi) {
+    for zi in hanzi {
+        let character = match zi
+            .to_pinyin()
+            .next()
+            .and_then(|wtf| wtf)
+            .map(Pinyin::with_tone)
+        {
             Some(pinyin) => pinyin,
             None => zi,
-        })
-        .collect::<Vec<&str>>()
-        .join("")
+        };
+        buffer.push_str(character);
+    }
+
+    buffer
+}
+
+fn pinyin(hans: &str) -> String {
+    let words: Vec<&str> = Jieba::new().cut(hans, false);
+
+    words
+        .iter()
+        .map(|word| extract_pinyin(word))
+        .collect::<Vec<String>>()
+        .join(" ")
 }
 
 fn main() -> io::Result<()> {
@@ -33,10 +52,14 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_spaces() {
+        assert_eq!(pinyin("我去工作"), "wǒ qù gōngzuò");
+    }
+
+    #[test]
     fn test_punctuation() {
-        // This should actually be "lǎopó, shēngrì kuàilè" (note the comma)
+        // This should actually be "lǎo pó, shēngrìkuàilè" (note the comma)
         // But I don't care to try to detect unicode punctuation at the moment
-        // and word detection is annoying
-        assert_eq!(pinyin("老婆，生日快乐"), "lǎopó，shēngrìkuàilè");
+        assert_eq!(pinyin("老婆，生日快乐"), "lǎopó ， shēngrìkuàilè");
     }
 }
