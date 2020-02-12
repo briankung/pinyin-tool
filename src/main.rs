@@ -58,8 +58,9 @@ mod tests {
 
     #[test]
     fn test_punctuation() {
-        // This should actually be "lǎo pó, shēngrìkuàilè" (note the comma)
+        // This should actually be "lǎo pó, shēngrì kuàilè" (note the comma)
         // But I don't care to try to detect unicode punctuation at the moment
+        // And jieba's default dict considers 生日快乐 to be one word
         assert_eq!(pinyin("老婆，生日快乐"), "lǎopó ， shēngrìkuàilè");
     }
 }
