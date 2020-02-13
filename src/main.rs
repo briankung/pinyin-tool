@@ -1,6 +1,6 @@
 use jieba_rs::Jieba;
 use pinyin::{to_pinyin_vec, Pinyin};
-use regex::Regex;
+use regex_syntax::utf8::Utf8Sequences;
 use std::io::{self, Read, Write};
 
 fn read_stdin() -> io::Result<String> {
@@ -9,7 +9,6 @@ fn read_stdin() -> io::Result<String> {
     Ok(buffer.trim().to_string())
 }
 
-// So this handles "words"
 fn extract_pinyin(word: &str) -> String {
     match to_pinyin_vec(word, Pinyin::with_tone).as_slice() {
         [] => word.to_string(),
@@ -17,15 +16,33 @@ fn extract_pinyin(word: &str) -> String {
     }
 }
 
+fn is_punctuation(word: &str) -> bool {
+    let bytes = word.as_bytes();
+
+    // Unicode lists from:
+    // https://www.key-shortcut.com/en/writing-systems/%E6%96%87%E5%AD%97-chinese-cjk/cjk-characters-1
+    // https://www.key-shortcut.com/en/character-tables/unicode-f000-ffff
+
+    let cjk_punctuation = Utf8Sequences::new('\u{3000}', '\u{303f}');
+    let full_width_punctuation = Utf8Sequences::new('\u{ff00}', '\u{ff0f}');
+    let punctuation: Vec<_> = cjk_punctuation.chain(full_width_punctuation).collect();
+
+    for range in punctuation {
+        if range.matches(bytes) {
+            return true;
+        }
+    }
+    false
+}
+
 fn pinyin_words(hans: &str) -> String {
     let pinyin_words = Jieba::new().cut(hans, false);
     let mut words_iter = pinyin_words.iter().map(|word| extract_pinyin(word));
 
-    let re = Regex::new(r"[\p{Punctuation}]").unwrap();
     let mut sentence = String::from("");
 
     while let Some(word) = words_iter.next() {
-        if re.is_match(&word) {
+        if is_punctuation(&word) {
             sentence = sentence.trim().to_string();
             sentence.push_str(&word);
         } else {
@@ -52,9 +69,6 @@ mod tests {
 
     #[test]
     fn test_punctuation() {
-        // This should actually be "lǎo pó, shēngrì kuàilè" (note the comma)
-        // But I don't care to try to detect unicode punctuation at the moment
-        // And jieba's default dict considers 生日快乐 to be one word
         assert_eq!(pinyin_words("老婆，我去工作"), "lǎopó，wǒ qù gōngzuò");
     }
 }
