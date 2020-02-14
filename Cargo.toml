@@ -4,6 +4,8 @@ version = "0.1.0"
 authors = ["Brian Kung <github@briankung.xyz>"]
 edition = "2018"
 description = "A simple command line tool to convert Chinese characters to pinyin."
+license = "MIT"
+repository = "https://github.com/briankung/pinyin-tool"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
