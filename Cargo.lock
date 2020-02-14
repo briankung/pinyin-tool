@@ -179,7 +179,7 @@ checksum = "7a70562daa2fe843bd56e87d6cf509fac3281fd1d3f06e11047a19686c425a8c"
 
 [[package]]
 name = "pinyin-tool"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "jieba-rs",
  "pinyin",

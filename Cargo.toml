@@ -1,6 +1,6 @@
 [package]
 name = "pinyin-tool"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Brian Kung <github@briankung.xyz>"]
 edition = "2018"
 description = """
@@ -10,6 +10,7 @@ license = "MIT"
 repository = "https://github.com/briankung/pinyin-tool"
 keywords = ["chinese", "pinyin", "zhongwen", "cli"]
 categories = ["text-processing", "command-line-utilities"]
+readme="README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
