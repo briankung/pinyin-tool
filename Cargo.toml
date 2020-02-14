@@ -3,9 +3,13 @@ name = "pinyin-tool"
 version = "0.1.0"
 authors = ["Brian Kung <github@briankung.xyz>"]
 edition = "2018"
-description = "A simple command line tool to convert Chinese characters to pinyin."
+description = """
+  A simple command line tool for converting Chinese characters to space-separate pinyin words.
+"""
 license = "MIT"
 repository = "https://github.com/briankung/pinyin-tool"
+keywords = ["chinese", "pinyin", "zhongwen", "cli"]
+categories = ["Text processing", "Command line utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
