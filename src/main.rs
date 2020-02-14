@@ -42,21 +42,26 @@ fn is_punctuation(word: &str) -> bool {
 }
 
 fn pinyin_words(hans: &str) -> String {
-    let pinyin_words = Jieba::new().cut(hans, false);
-    let mut words_iter = pinyin_words.iter().map(|word| extract_pinyin(word));
+    let words = Jieba::new()
+        .cut(hans, false)
+        .iter()
+        .map(|word| extract_pinyin(word))
+        .collect::<Vec<String>>();
 
     let mut sentence = String::from("");
+    let mut prev_is_pinyin = false;
 
-    while let Some(word) = words_iter.next() {
-        if is_punctuation(&word) {
-            sentence = sentence.trim().to_string();
-            sentence.push_str(&word);
-        } else {
-            sentence.push_str(&format!("{} ", &word));
+    for word in words.iter() {
+        let is_pinyin = !is_punctuation(word);
+
+        if is_pinyin && prev_is_pinyin {
+            sentence.push_str(" ");
         }
+        sentence.push_str(word);
+        prev_is_pinyin = is_pinyin;
     }
 
-    sentence.trim().to_string()
+    sentence.to_string()
 }
 
 fn main() -> io::Result<()> {
