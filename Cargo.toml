@@ -9,7 +9,7 @@ description = """
 license = "MIT"
 repository = "https://github.com/briankung/pinyin-tool"
 keywords = ["chinese", "pinyin", "zhongwen", "cli"]
-categories = ["Text processing", "Command line utilities"]
+categories = ["text-processing", "command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
