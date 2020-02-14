@@ -13,7 +13,6 @@ $ cargo install pinyin-tool
 Right now, `pinyin-tool` only supports stdin input:
 
 ```sh
-
 $ echo 老婆,我去工作 | pinyin-tool
 lǎopó,wǒ qù gōngzuò
 ```
