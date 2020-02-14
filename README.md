@@ -2,6 +2,12 @@
 
 A simple command line tool to convert Chinese characters to pinyin.
 
+## Installation
+
+```sh
+$ cargo install pinyin-tool
+```
+
 ## Usage
 
 Right now, `pinyin-tool` only supports stdin input:
