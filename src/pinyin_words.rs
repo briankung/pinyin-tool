@@ -15,7 +15,7 @@ fn is_punctuation(word: &str) -> bool {
     // Unicode lists from:
     // https://www.key-shortcut.com/en/writing-systems/%E6%96%87%E5%AD%97-chinese-cjk/cjk-characters-1
     // https://www.key-shortcut.com/en/character-tables/unicode-f000-ffff
-    let ascii_punctuation = Utf8Sequences::new('\u{23}', '\u{2f}');
+    let ascii_punctuation = Utf8Sequences::new('\u{20}', '\u{2f}');
     let cjk_punctuation = Utf8Sequences::new('\u{3000}', '\u{303f}');
     let full_width_punctuation = Utf8Sequences::new('\u{ff00}', '\u{ff0f}')
         .chain(Utf8Sequences::new('\u{ff1a}', '\u{ff20}'))
