@@ -21,17 +21,13 @@ fn is_punctuation(word: &str) -> bool {
         .chain(Utf8Sequences::new('\u{ff1a}', '\u{ff20}'))
         .chain(Utf8Sequences::new('\u{ff3b}', '\u{ff40}'))
         .chain(Utf8Sequences::new('\u{ff5b}', '\u{ff65}'));
+
     let punctuation: Vec<_> = ascii_punctuation
         .chain(cjk_punctuation)
         .chain(full_width_punctuation)
         .collect();
 
-    for range in punctuation {
-        if range.matches(bytes) {
-            return true;
-        }
-    }
-    false
+    punctuation.iter().any(|r| r.matches(bytes))
 }
 
 pub fn pinyin_words(hans: &str) -> String {
@@ -45,16 +41,16 @@ pub fn pinyin_words(hans: &str) -> String {
     let mut prev_is_pinyin = false;
 
     for word in words.iter() {
-        let is_pinyin = !is_punctuation(word);
+        let not_punctuation = !is_punctuation(word);
 
-        if is_pinyin && prev_is_pinyin {
-            sentence.push_str(" ");
+        if not_punctuation && prev_is_pinyin {
+            sentence.push(' ');
         }
         sentence.push_str(word);
-        prev_is_pinyin = is_pinyin;
+        prev_is_pinyin = not_punctuation;
     }
 
-    sentence.to_string()
+    sentence
 }
 
 #[cfg(test)]
