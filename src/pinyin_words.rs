@@ -1,9 +1,9 @@
 use jieba_rs::Jieba;
-use pinyin::{to_pinyin_vec, Pinyin};
+use pinyin::{self, Pinyin};
 use regex_syntax::utf8::Utf8Sequences;
 
 fn extract_pinyin(word: &str) -> String {
-    match to_pinyin_vec(word, Pinyin::with_tone).as_slice() {
+    match pinyin::to_pinyin_vec(word, Pinyin::with_tone).as_slice() {
         [] => word.to_string(),
         pinyin => pinyin.join(""),
     }
@@ -34,23 +34,23 @@ pub fn pinyin_words(hans: &str) -> String {
     let words = Jieba::new()
         .cut(hans, false)
         .iter()
-        .map(|word| extract_pinyin(word))
+        .map(|&word| extract_pinyin(word))
         .collect::<Vec<String>>();
 
-    let mut sentence = String::from("");
     let mut prev_is_pinyin = false;
 
-    for word in words.iter() {
+    words.iter().fold(String::new(), |mut sentence, word| {
         let not_punctuation = !is_punctuation(word);
 
         if not_punctuation && prev_is_pinyin {
             sentence.push(' ');
         }
+
         sentence.push_str(word);
         prev_is_pinyin = not_punctuation;
-    }
 
-    sentence
+        sentence
+    })
 }
 
 #[cfg(test)]
